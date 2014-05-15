@@ -1,0 +1,48 @@
+model {
+
+# Random effects logistic regression part of model
+
+for(i in 1:n){
+
+  logit(rho[i]) <- theta[center[i]] + fixed[i]
+
+	y[i] ~ dbern(rho[i])
+
+	fixed[i] <- inprod(beta[], L[i,])
+
+}
+
+
+for(j in 1:m){
+
+	theta[j] ~ dnorm(mu, tau.i)
+
+	center.effect[j] <- theta[j]
+
+	mean.pop.out[j] <- mean(out[,j])
+	mean.out.lambdaM[j] <- mean.pop.out[j] - (1-lambda)*mean.out
+	mean.out.lambdaP[j] <- mean.pop.out[j] - (1+lambda)*mean.out
+
+	for(i in 1:n){
+		logit(out[i,j]) <- theta[j] + fixed[i]   # outcome of interest
+	}
+
+}
+
+
+mean.out <- mean(rho[])
+
+# Baseline distribution
+
+se.i ~ dunif(0,10)
+tau.i <- 1/(se.i*se.i)
+
+mu ~ dnorm(0,0.04)
+
+for(i in 1:l){ beta[i] ~ dnorm(0,0.01)}
+
+
+
+}
+
+
